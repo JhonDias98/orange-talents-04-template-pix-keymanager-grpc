@@ -5,6 +5,7 @@ plugins {
     id("io.micronaut.application") version "1.5.0"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.4.32"
     id("com.google.protobuf") version "0.8.15"
+    id("org.jetbrains.kotlin.plugin.jpa") version "1.4.32"
 }
 
 version = "0.1"
@@ -31,10 +32,21 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     runtimeOnly("ch.qos.logback:logback-classic")
     implementation("io.micronaut:micronaut-validation")
-
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
-
     testImplementation("io.micronaut:micronaut-http-client")
+
+    //JPA
+    annotationProcessor("io.micronaut.data:micronaut-data-processor")
+    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+
+    //Hibernate Validator
+    implementation("org.hibernate:hibernate-validator:7.0.1.Final")
+    //Client
+    implementation("io.micronaut:micronaut-http-client")
+
+    //MySQL - Aplicação
+    runtimeOnly("mysql:mysql-connector-java")
 
 }
 
