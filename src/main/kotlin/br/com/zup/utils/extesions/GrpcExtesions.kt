@@ -5,14 +5,14 @@ import br.com.zup.TipoDeChave.*
 import br.com.zup.TipoDeConta
 import br.com.zup.TipoDeConta.*
 import br.com.zup.chavepix.NovaChavePix
-import br.com.zup.chavepix.registro.TipoDeChave
+import br.com.zup.chavepix.registro.TipoDeChaveRegex
 
 fun RegistraChavePixRequest.toModel(): NovaChavePix {
     return NovaChavePix(
         clienteId = clientId,
-        tipoDeChave = when(tipoDeChave){
+        tipoDeChaveRegex = when(tipoDeChave){
             UNKNOWN_TIPO_CHAVE -> null
-            else -> TipoDeChave.valueOf(tipoDeChave.name)
+            else -> TipoDeChaveRegex.valueOf(tipoDeChave.name)
         },
         chave = chave,
         tipoDeConta = when(tipoDeConta){

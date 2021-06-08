@@ -1,7 +1,7 @@
 package br.com.zup.chavepix
 
 import br.com.zup.TipoDeConta
-import br.com.zup.chavepix.registro.TipoDeChave
+import br.com.zup.chavepix.registro.TipoDeChaveRegex
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -17,7 +17,7 @@ class ChavePix(@field:NotNull
                @field:NotNull
                @Enumerated(EnumType.STRING)
                @Column(nullable = false)
-               val tipodeChave: TipoDeChave,
+               val tipoDeChaveRegex: TipoDeChaveRegex,
 
                @field:NotBlank
                @Column(unique = true, nullable = false)

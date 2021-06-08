@@ -32,9 +32,9 @@ class ValidPixKeyValidator : ConstraintValidator<ValidPixKey, NovaChavePix> {
         context: ConstraintValidatorContext?
     ): Boolean {
 
-        if (value?.tipoDeChave == null) {
+        if (value?.tipoDeChaveRegex == null) {
             return false
         }
-        return value.tipoDeChave.valida(value.chave)
+        return value.tipoDeChaveRegex.valida(value.chave)
     }
 }

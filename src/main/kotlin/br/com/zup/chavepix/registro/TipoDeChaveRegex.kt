@@ -2,7 +2,7 @@ package br.com.zup.chavepix.registro
 
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator
 
-enum class TipoDeChave {
+enum class TipoDeChaveRegex {
     CPF {
         override fun valida(chave: String?): Boolean {
             if (chave.isNullOrBlank()) {
@@ -19,7 +19,7 @@ enum class TipoDeChave {
         }
     },
 
-    TELEFONE {
+    CELULAR{
         override fun valida(chave: String?): Boolean {
             if (chave.isNullOrBlank()) {
                 return false
