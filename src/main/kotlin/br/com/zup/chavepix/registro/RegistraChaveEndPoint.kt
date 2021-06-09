@@ -22,7 +22,7 @@ class RegistraChaveEndPoint(@Inject private val service: NovaChavePixService)
         val service = service.registra(novaChave)
         responseObserver?.onNext(RegistraChavePixResponse.newBuilder()
             .setClientId(service.clientId.toString())
-            .setPixId(service.chave)
+            .setPixId(service.pixId.toString())
             .build())
         responseObserver?.onCompleted()
     }
