@@ -223,7 +223,7 @@ internal class RegistraChaveEndPointTest(
     }
 
     @Test
-    fun `nao deve cadastrar chave pix quando a mesma já existe`() {
+    fun `nao deve cadastrar chave pix quando a mesma ja existe`() {
         chavePixRepository.save(
             ChavePix(
                 clientId = CLIENT_ID,
@@ -252,7 +252,7 @@ internal class RegistraChaveEndPointTest(
 
         with(error) {
             assertEquals(Status.ALREADY_EXISTS.code, status.code)
-            assertEquals("Chave ja cadastrada*******-", status.description)
+            assertEquals("Chave ja cadastrada", status.description)
         }
     }
 
