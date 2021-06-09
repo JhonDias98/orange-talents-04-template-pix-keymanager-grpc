@@ -2,6 +2,7 @@ package br.com.zup.chavepix
 
 import br.com.zup.TipoDeConta
 import br.com.zup.chavepix.registro.TipoDeChaveRegex
+import io.micronaut.context.annotation.Type
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -11,7 +12,7 @@ import javax.validation.constraints.NotNull
 
 @Entity
 class ChavePix(@field:NotNull
-               @Column(nullable = false)
+               @Column(nullable = false, columnDefinition = "BINARY(16)")
                val clientId: UUID,
 
                @field:NotNull
@@ -33,6 +34,7 @@ class ChavePix(@field:NotNull
                val tipoDeConta: TipoDeConta) {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
+    @Column(nullable = false, columnDefinition = "BINARY(16)")
     val pixId: UUID = UUID.randomUUID()
     val criadaEm: LocalDateTime = LocalDateTime.now()
 }

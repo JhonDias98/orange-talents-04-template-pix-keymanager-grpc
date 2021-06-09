@@ -1,6 +1,7 @@
 package br.com.zup.config.grpc.interceptor
 
 import br.com.zup.config.exceptions.ChavePixExistenteException
+import br.com.zup.config.exceptions.ChavePixNaoEncontradaException
 import io.grpc.Status
 import io.micronaut.http.client.exceptions.HttpClientResponseException
 import javax.validation.ConstraintViolationException
@@ -13,6 +14,7 @@ class DefaultExceptionHandler : ExceptionHandler<Exception> {
             is IllegalStateException -> Status.FAILED_PRECONDITION.withDescription(e.message)
             is ConstraintViolationException -> Status.INVALID_ARGUMENT.withDescription(e.message)
             is ChavePixExistenteException -> Status.ALREADY_EXISTS.withDescription(e.message)
+            is ChavePixNaoEncontradaException -> Status.NOT_FOUND.withDescription(e.message)
 
             else -> Status.UNKNOWN.withDescription(e.message)
         }
