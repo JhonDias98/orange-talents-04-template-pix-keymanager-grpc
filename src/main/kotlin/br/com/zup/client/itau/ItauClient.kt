@@ -1,6 +1,5 @@
 package br.com.zup.client.itau
 
-import br.com.zup.client.DadosDaContaResponse
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable

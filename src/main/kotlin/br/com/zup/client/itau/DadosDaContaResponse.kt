@@ -1,4 +1,4 @@
-package br.com.zup.client
+package br.com.zup.client.itau
 
 import br.com.zup.chavepix.ContaAssociada
 
@@ -15,11 +15,11 @@ data class DadosDaContaResponse(
             nomeDoTitular = this.titular.nome,
             cpfDoTitular = this.titular.cpf,
             agencia = this.agencia,
-            numeroDaConta = this.numero
+            numeroDaConta = this.numero,
+            ispb = this.instituicao.ispb
         )
 
     }
-
 }
 
 data class TitularResponse(val id: String, val nome: String, val cpf: String)

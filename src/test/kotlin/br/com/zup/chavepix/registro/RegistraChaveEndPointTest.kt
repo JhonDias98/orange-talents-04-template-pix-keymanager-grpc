@@ -7,9 +7,9 @@ import br.com.zup.TipoDeConta
 import br.com.zup.chavepix.ChavePix
 import br.com.zup.chavepix.ChavePixRepository
 import br.com.zup.chavepix.ContaAssociada
-import br.com.zup.client.DadosDaContaResponse
-import br.com.zup.client.InstituicaoResponse
-import br.com.zup.client.TitularResponse
+import br.com.zup.client.itau.DadosDaContaResponse
+import br.com.zup.client.itau.InstituicaoResponse
+import br.com.zup.client.itau.TitularResponse
 import br.com.zup.client.itau.ItauClient
 import io.grpc.Channel
 import io.grpc.Status
