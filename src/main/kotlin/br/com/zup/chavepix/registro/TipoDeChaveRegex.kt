@@ -19,7 +19,7 @@ enum class TipoDeChaveRegex {
         }
     },
 
-    CELULAR{
+    PHONE{
         override fun valida(chave: String?): Boolean {
             if (chave.isNullOrBlank()) {
                 return false
@@ -37,7 +37,7 @@ enum class TipoDeChaveRegex {
         }
     },
 
-    ALEATORIA {
+    RANDOM {
         override fun valida(chave: String?) = chave.isNullOrBlank() //Não deve ser preenchida
     },
 
