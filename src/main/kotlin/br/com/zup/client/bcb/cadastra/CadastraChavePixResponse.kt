@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 data class CadastraChavePixResponse(
     val keyType: String,
     val key: String,
-    val bankAccount: BankAccout,
+    val bankAccount: BankAccount,
     val owner: Owner,
     val createdAt: LocalDateTime
 )

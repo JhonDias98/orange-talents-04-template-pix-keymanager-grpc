@@ -1,6 +1,6 @@
 package br.com.zup.client.bcb.cadastra
 
-data class BankAccout(
+data class BankAccount(
     val participant: String,
     val branch: String,
     val accountNumber: String,

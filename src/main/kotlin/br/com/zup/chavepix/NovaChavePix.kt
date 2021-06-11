@@ -35,7 +35,7 @@ data class NovaChavePix(
         return CadastraChavePixRequest(
             keyType = this.tipoDeChaveRegex.toString(),
             key = this.chave!!,
-            bankAccount = BankAccout(
+            bankAccount = BankAccount(
                 participant = conta.ispb,
                 branch = conta.agencia,
                 accountNumber = conta.numeroDaConta,
