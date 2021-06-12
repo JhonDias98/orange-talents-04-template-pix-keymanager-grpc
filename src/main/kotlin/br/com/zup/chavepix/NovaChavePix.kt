@@ -33,7 +33,7 @@ data class NovaChavePix(
 
     fun toBcb(conta: ContaAssociada): CadastraChavePixRequest {
         return CadastraChavePixRequest(
-            keyType = this.tipoDeChaveRegex.toString(),
+            keyType = this.tipoDeChaveRegex!!,
             key = this.chave!!,
             bankAccount = BankAccount(
                 participant = conta.ispb,
