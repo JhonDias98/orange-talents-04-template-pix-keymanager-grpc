@@ -7,6 +7,9 @@ import br.com.zup.TipoDeConta
 import br.com.zup.chavepix.ChavePix
 import br.com.zup.chavepix.ChavePixRepository
 import br.com.zup.chavepix.ContaAssociada
+import br.com.zup.chavepix.NovaChavePix
+import br.com.zup.client.bcb.BancoCentralClient
+import br.com.zup.client.bcb.cadastra.*
 import br.com.zup.client.itau.DadosDaContaResponse
 import br.com.zup.client.itau.InstituicaoResponse
 import br.com.zup.client.itau.TitularResponse
@@ -29,6 +32,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import org.mockito.Mockito.mock
+import java.time.LocalDateTime
 
 @MicronautTest(transactional = false)
 internal class RegistraChaveEndPointTest(
@@ -37,6 +41,9 @@ internal class RegistraChaveEndPointTest(
 ) {
     @field:Inject
     lateinit var itauClient: ItauClient
+
+    @field:Inject
+    lateinit var bcbClient: BancoCentralClient
 
     companion object{
         val CLIENT_ID = UUID.randomUUID()
@@ -47,180 +54,139 @@ internal class RegistraChaveEndPointTest(
         chavePixRepository.deleteAll()
     }
 
-    @Test
-    fun `deve cadastrar uma nova chave pix(cpf)`() {
-
-        val request = RegistraChavePixRequest.newBuilder()
-            .setClientId(CLIENT_ID.toString())
-            .setTipoDeChave(TipoDeChave.CPF)
-            .setChave("65640120045")
-            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
-            .build()
-
-        val dadosDaContaRespose = DadosDaContaResponse(
+    private fun dadosDaContaResponse(): DadosDaContaResponse {
+        return DadosDaContaResponse(
             tipo = "CONTA_CORRENTE",
-            instituicao = InstituicaoResponse("ITAÚ UNIBANCO S.A", "60701190"),
-            agencia = "0001",
+            instituicao = InstituicaoResponse("UNIBANCO ITAU SA", ContaAssociada.ITAU_UNIBANCO_ISPB),
+            agencia = "1218",
             numero = "291900",
             titular = TitularResponse(CLIENT_ID.toString(), "Rafael M C Ponte", "02467781054")
         )
-        `when`(itauClient.buscaContaPorTipo(request.clientId, request.tipoDeConta.name))
-            .thenReturn(HttpResponse.ok(dadosDaContaRespose))
+    }
 
-        val response = grpcClient.registra(request)
+    private fun cadastraChavePixRequest(): CadastraChavePixRequest {
+        return CadastraChavePixRequest(
+            keyType = TipoDeChaveRegex.PHONE,
+            key = "+5511911223344",
+            bankAccount = bankAccount(),
+            owner = owner()
+        )
+    }
 
-        with(response) {
-            assertTrue(chavePixRepository.existsByChave(request.chave))
-            assertEquals(CLIENT_ID.toString(), clientId)
-            assertNotNull(pixId)
-        }
+    private fun cadastraChavePixResponse(): CadastraChavePixResponse {
+        return CadastraChavePixResponse(
+            keyType = TipoDeChaveRegex.PHONE,
+            key = "+5511911223344",
+            bankAccount = bankAccount(),
+            owner = owner(),
+            createdAt = LocalDateTime.now()
+        )
+    }
+
+    private fun bankAccount(): BankAccount {
+        return BankAccount(
+            participant = ContaAssociada.ITAU_UNIBANCO_ISPB,
+            branch = "1218",
+            accountNumber = "291900",
+            accountType = AccountType.CACC
+        )
+    }
+
+    private fun owner(): Owner {
+        return Owner(
+            type = OwnerType.NATURAL_PERSON,
+            name = "Rafael Ponte",
+            taxIdNumber = "63657520325"
+        )
     }
 
     @Test
-    fun `deve cadastrar uma nova chave pix(celular) valida`() {
-
-        val request = RegistraChavePixRequest.newBuilder()
-            .setClientId(CLIENT_ID.toString())
-            .setTipoDeChave(TipoDeChave.CELULAR)
-            .setChave("+5511911223344")
-            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
-            .build()
-
-        val dadosDaContaRespose = DadosDaContaResponse(
-            tipo = "CONTA_CORRENTE",
-            instituicao = InstituicaoResponse("ITAÚ UNIBANCO S.A", "60701190"),
-            agencia = "0001",
-            numero = "291900",
-            titular = TitularResponse(CLIENT_ID.toString(), "Rafael M C Ponte", "02467781054")
-        )
-        `when`(itauClient.buscaContaPorTipo(request.clientId, request.tipoDeConta.name))
-            .thenReturn(HttpResponse.ok(dadosDaContaRespose))
-
-        val response = grpcClient.registra(request)
-
-        with(response) {
-            assertTrue(chavePixRepository.existsByChave(request.chave))
-            assertEquals(CLIENT_ID.toString(), clientId)
-            assertNotNull(pixId)
-        }
-    }
-
-    @Test
-    fun `deve cadastrar uma nova chave pix(email) valida`() {
-
-        val request = RegistraChavePixRequest.newBuilder()
-            .setClientId(CLIENT_ID.toString())
-            .setTipoDeChave(TipoDeChave.EMAIL)
-            .setChave("jonathan@email.com")
-            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
-            .build()
-
-        val dadosDaContaRespose = DadosDaContaResponse(
-            tipo = "CONTA_CORRENTE",
-            instituicao = InstituicaoResponse("ITAÚ UNIBANCO S.A", "60701190"),
-            agencia = "0001",
-            numero = "291900",
-            titular = TitularResponse(CLIENT_ID.toString(),"Rafael M C Ponte", "02467781054")
-        )
-        `when`(itauClient.buscaContaPorTipo(request.clientId, request.tipoDeConta.name))
-            .thenReturn(HttpResponse.ok(dadosDaContaRespose))
-
-        val response = grpcClient.registra(request)
-
+    fun `deve cadastrar chave pix no banco`(){
+        //cenario
+        `when` (itauClient.buscaContaPorTipo(clienteId = CLIENT_ID.toString(), tipo = "CONTA_CORRENTE"))
+            .thenReturn(HttpResponse.ok(dadosDaContaResponse()))
+        `when`(bcbClient.create(cadastraChavePixRequest()))
+            .thenReturn(HttpResponse.created(cadastraChavePixResponse()))
+        //açao
+        val response = grpcClient.registra(
+            RegistraChavePixRequest.newBuilder()
+                .setClientId(CLIENT_ID.toString())
+                .setTipoDeChave(TipoDeChave.PHONE)
+                .setChave("+5511911223344")
+                .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
+                .build())
+        //validação
         with(response){
-            assertTrue(chavePixRepository.existsByChave(request.chave))
             assertEquals(CLIENT_ID.toString(), clientId)
             assertNotNull(pixId)
         }
     }
 
     @Test
-    fun `deve cadastrar uma nova chave pix(aleatoria) valida`() {
+    fun `nao deve cadastrar chave pix quando nao encontrar dados da conta cliente`(){
+        // cenário
+        `when`(itauClient.buscaContaPorTipo(clienteId = CLIENT_ID.toString(), tipo = "CONTA_CORRENTE"))
+            .thenReturn(HttpResponse.notFound())
 
-        val request = RegistraChavePixRequest.newBuilder()
-            .setClientId(CLIENT_ID.toString())
-            .setTipoDeChave(TipoDeChave.ALEATORIA)
-            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
-            .build()
+        // ação
+        val thrown = assertThrows<StatusRuntimeException> {
+            grpcClient.registra(
+                RegistraChavePixRequest.newBuilder()
+                    .setClientId(CLIENT_ID.toString())
+                    .setTipoDeChave(TipoDeChave.PHONE)
+                    .setChave("+5511911223344")
+                    .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
+                    .build()
+            )
+        }
 
-        val dadosDaContaRespose = DadosDaContaResponse(
-            tipo = "CONTA_CORRENTE",
-            instituicao = InstituicaoResponse("ITAÚ UNIBANCO S.A", "60701190"),
-            agencia = "0001",
-            numero = "291900",
-            titular = TitularResponse(CLIENT_ID.toString(), "Rafael M C Ponte", "02467781054")
-        )
-        `when`(itauClient.buscaContaPorTipo(request.clientId, request.tipoDeConta.name))
-            .thenReturn(HttpResponse.ok(dadosDaContaRespose))
+        // validação
+        with(thrown) {
+            assertEquals(Status.FAILED_PRECONDITION.code, status.code)
+            assertEquals("Cliente nao encontrato no itau", status.description)
+        }
+    }
 
-        val response = grpcClient.registra(request)
+    //TODO Corrigir teste
+    @Test
+    fun `nao deve cadastrar chave pix quando nao for possivel registrar chave no BCB`() {
+        // cenário
+        `when`(itauClient.buscaContaPorTipo(clienteId = CLIENT_ID.toString(), tipo = "CONTA_CORRENTE"))
+            .thenReturn(HttpResponse.ok(dadosDaContaResponse()))
 
-        with(response) {
-            assertTrue(chavePixRepository.existsByChave(response.pixId.toString()))
-            assertEquals(CLIENT_ID.toString(), clientId)
-            assertNotNull(pixId)
+        `when`(bcbClient.create(cadastraChavePixRequest()))
+            .thenReturn(HttpResponse.badRequest())
+
+        // ação
+        val thrown = assertThrows<StatusRuntimeException> {
+            grpcClient.registra(RegistraChavePixRequest.newBuilder()
+                .setClientId(CLIENT_ID.toString())
+                .setTipoDeChave(TipoDeChave.PHONE)
+                .setChave("+5511911223344")
+                .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
+                .build())
+        }
+
+        with(thrown) {
+            assertEquals(Status.FAILED_PRECONDITION.code, status.code)
         }
     }
 
     @Test
-    fun `nao deve cadastrar uma nova chave pix(cpf) invalida`() {
-
-        val request = RegistraChavePixRequest.newBuilder()
-            .setClientId("c56dfef4-7901-44fb-84e2-a2cefb157890")
-            .setTipoDeChave(TipoDeChave.CPF)
-            .setChave("11144466687")
-            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
-            .build()
-
-        val error = assertThrows <StatusRuntimeException> {
-            grpcClient.registra(request)
+    fun `nao deve cadastrar chave pix quando parametros forem invalidos`(){
+        // ação
+        val thrown = assertThrows<StatusRuntimeException> {
+            grpcClient.registra(RegistraChavePixRequest.newBuilder().build())
         }
 
-        with(error) {
+        // validação
+        with(thrown) {
             assertEquals(Status.INVALID_ARGUMENT.code, status.code)
             assertEquals("Dados inválidos", status.description)
+
         }
     }
 
-    @Test
-    fun `nao deve cadastrar uma nova chave pix(celular) invalida`() {
-
-        val request = RegistraChavePixRequest.newBuilder()
-            .setClientId("c56dfef4-7901-44fb-84e2-a2cefb157890")
-            .setTipoDeChave(TipoDeChave.CELULAR)
-            .setChave("1111")
-            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
-            .build()
-
-        val error = assertThrows <StatusRuntimeException> {
-            grpcClient.registra(request)
-        }
-
-        with(error) {
-            assertEquals(Status.INVALID_ARGUMENT.code, status.code)
-            assertEquals("Dados inválidos", status.description)
-        }
-    }
-
-    @Test
-    fun `nao deve cadastrar uma nova chave pix(email) invalida`() {
-
-        val request = RegistraChavePixRequest.newBuilder()
-            .setClientId("c56dfef4-7901-44fb-84e2-a2cefb157890")
-            .setTipoDeChave(TipoDeChave.EMAIL)
-            .setChave("jonathanemail.com")
-            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
-            .build()
-
-        val error = assertThrows <StatusRuntimeException> {
-            grpcClient.registra(request)
-        }
-
-        with(error) {
-            assertEquals(Status.INVALID_ARGUMENT.code, status.code)
-            assertEquals("Dados inválidos", status.description)
-        }
-    }
 
     @Test
     fun `nao deve cadastrar chave pix quando a mesma ja existe`() {
@@ -235,7 +201,8 @@ internal class RegistraChaveEndPointTest(
                     nomeDoTitular = "Rafael M C Ponte",
                     cpfDoTitular = "02467781054",
                     agencia = "0001",
-                    numeroDaConta = "291900"
+                    numeroDaConta = "291900",
+                    ispb = "60701190"
                 )
             )
         )
@@ -256,32 +223,14 @@ internal class RegistraChaveEndPointTest(
         }
     }
 
-    @Test
-    fun `nao deve cadastrar uma nova chave pix quando o clientId nao existir no sistema`() {
-
-        val request = RegistraChavePixRequest.newBuilder()
-            .setClientId(CLIENT_ID.toString())
-            .setTipoDeChave(TipoDeChave.EMAIL)
-            .setChave("jonathan@email.com")
-            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
-            .build()
-
-        `when`(itauClient.buscaContaPorTipo(clienteId = CLIENT_ID.toString(), tipo = request.tipoDeConta.name))
-            .thenReturn(HttpResponse.notFound())
-
-
-        val error = assertThrows <StatusRuntimeException> {
-            grpcClient.registra(request)
-        }
-
-        with(error) {
-            assertEquals(Status.FAILED_PRECONDITION.code, error.status.code)
-        }
-    }
-
     @MockBean(ItauClient::class)
     fun itauClientMock(): ItauClient {
         return mock (ItauClient::class.java)
+    }
+
+    @MockBean(BancoCentralClient::class)
+    fun bcbClientMock(): BancoCentralClient {
+        return mock (BancoCentralClient::class.java)
     }
 
     @Factory

@@ -35,14 +35,15 @@ class NovaChavePixService(@Inject val repository: ChavePixRepository,
         val conta = itauClientResponse.body()?.toModel() ?: throw IllegalStateException("Cliente nao encontrato no itau")
         Logger.info("Busca pela conta concluído com sucesso")
 
-        //Cadastrando a chave no Banco Central do Brasil (BCB)
-        val bcbResponse = bcbClient.create(novaChavePix.toBcb(conta))
-        Logger.info("Registrando chave Pix no Banco Central do Brasil")
-
         //Salva no banco de dados
-        val novaChave = novaChavePix.toModel(conta, bcbResponse.body()!!)
+        val novaChave = novaChavePix.toModel(conta)
         repository.save(novaChave)
         Logger.info("Chave Pix salva com sucesso no sistema")
+
+        //Cadastrando a chave no Banco Central do Brasil (BCB)
+        val bcbResponse = bcbClient.create(CadastraChavePixRequest.of(chave = novaChave))
+        Logger.info("Registrando chave Pix no Banco Central do Brasil")
+
         return novaChave
     }
 }

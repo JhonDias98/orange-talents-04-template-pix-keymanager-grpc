@@ -15,4 +15,8 @@ class ContaAssociada(
         return "Instituicao: $instituicao, \nTitular: $nomeDoTitular, \nCPF: $cpfDoTitular,  " +
                 "\nAgencia: $agencia, \nNumero: $numeroDaConta, \nISPB: $ispb"
     }
+
+    companion object {
+        public val ITAU_UNIBANCO_ISPB: String = "60701190"
+    }
 }

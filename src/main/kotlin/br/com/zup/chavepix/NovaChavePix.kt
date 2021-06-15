@@ -20,32 +20,13 @@ data class NovaChavePix(
     @field:Size(max = 77) val chave: String
 ) {
 
-    fun toModel(conta: ContaAssociada, bcbResponse: CadastraChavePixResponse): ChavePix{
+    fun toModel(conta: ContaAssociada): ChavePix{
         return ChavePix(
             clientId = UUID.fromString(this.clienteId),
             tipoDeChaveRegex = TipoDeChaveRegex.valueOf(this.tipoDeChaveRegex!!.name),
             tipoDeConta = TipoDeConta.valueOf(this.tipoDeConta!!.name),
-            chave = bcbResponse.key,
-            //chave = if(this.tipoDeChaveRegex == TipoDeChaveRegex.ALEATORIA) UUID.randomUUID().toString() else this.chave,
+            chave = if(this.tipoDeChaveRegex == TipoDeChaveRegex.RANDOM) UUID.randomUUID().toString() else this.chave,
             conta = conta
-        )
-    }
-
-    fun toBcb(conta: ContaAssociada): CadastraChavePixRequest {
-        return CadastraChavePixRequest(
-            keyType = this.tipoDeChaveRegex!!,
-            key = this.chave!!,
-            bankAccount = BankAccount(
-                participant = conta.ispb,
-                branch = conta.agencia,
-                accountNumber = conta.numeroDaConta,
-                accountType = if (this.tipoDeConta == TipoDeConta.CONTA_CORRENTE) AccountType.CACC else AccountType.SVGS
-            ),
-            owner = Owner(
-                type = OwnerType.NATURAL_PERSON,
-                name = conta.nomeDoTitular,
-                taxIdNumber = conta.cpfDoTitular
-            )
         )
     }
 
