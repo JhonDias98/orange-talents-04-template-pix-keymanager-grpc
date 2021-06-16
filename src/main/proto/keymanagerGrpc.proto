@@ -21,6 +21,10 @@ service KeymanagerConsultaGrpcService {
   rpc consulta (ConsultaChavePixRequest) returns (ConsultaChavePixResponse) {}
 }
 
+service KeymanagerListaGrpcService {
+  rpc lista (ListaChavePixRequest) returns (ListaChavePixResponse) {}
+}
+
 
 enum TipoDeChave {
   UNKNOWN_TIPO_CHAVE = 0;
@@ -87,4 +91,21 @@ message ConsultaChavePixResponse {
   string clientId = 1;
   string pixId = 2;
   ChavePix chave = 3;
+}
+
+message ListaChavePixRequest {
+  string clientId = 1;
+}
+
+message ListaChavePixResponse {
+  message ChavePix {
+    string pixId = 1;
+    TipoDeChave tipo = 2;
+    string chave = 3;
+    TipoDeConta tipoDeConta = 4;
+    google.protobuf.Timestamp criadaEm = 5;
+  }
+  string clientId = 1;
+  repeated ChavePix chaves = 2;
+
 }
