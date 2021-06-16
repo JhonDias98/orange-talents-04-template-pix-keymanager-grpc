@@ -32,8 +32,7 @@ class ConsultaChavePixResponse(
                 nomeDoTitular = owner.name,
                 cpfDoTitular = owner.taxIdNumber,
                 agencia = bankAccount.branch,
-                numeroDaConta = bankAccount.accountNumber,
-                ispb = "00000"
+                numeroDaConta = bankAccount.accountNumber
             )
 
         )

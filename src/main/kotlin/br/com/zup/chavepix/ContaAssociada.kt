@@ -8,12 +8,11 @@ class ContaAssociada(
     val nomeDoTitular: String,
     val cpfDoTitular: String,
     val agencia: String,
-    val numeroDaConta: String,
-    val ispb: String
+    val numeroDaConta: String
 ) {
     override fun toString(): String {
         return "Instituicao: $instituicao, \nTitular: $nomeDoTitular, \nCPF: $cpfDoTitular,  " +
-                "\nAgencia: $agencia, \nNumero: $numeroDaConta, \nISPB: $ispb"
+                "\nAgencia: $agencia, \nNumero: $numeroDaConta"
     }
 
     companion object {
