@@ -37,4 +37,9 @@ class ChavePix(@field:NotNull
     @Column(nullable = false, columnDefinition = "BINARY(16)")
     val pixId: UUID = UUID.randomUUID()
     val criadaEm: LocalDateTime = LocalDateTime.now()
+
+    /**
+     * Verifica se esta chave pertence a este cliente
+     */
+    fun pertenceAo(clientId: UUID) = this.clientId.equals(clientId)
 }

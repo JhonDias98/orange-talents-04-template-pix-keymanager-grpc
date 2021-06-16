@@ -3,6 +3,7 @@ package br.com.zup.client.bcb
 import br.com.zup.client.bcb.cadastra.CadastraChavePixRequest
 import br.com.zup.client.bcb.cadastra.CadastraChavePixResponse
 import br.com.zup.client.bcb.consulta.ConsultaChavePixResponse
+//import br.com.zup.client.bcb.consulta.ConsultaChavePixResponse
 import br.com.zup.client.bcb.remove.RemoveChavePixRequest
 import br.com.zup.client.bcb.remove.RemoveChavePixResponse
 import io.micronaut.http.HttpResponse
