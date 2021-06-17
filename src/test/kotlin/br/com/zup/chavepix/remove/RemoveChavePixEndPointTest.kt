@@ -67,8 +67,7 @@ internal class RemoveChavePixEndPointTest(
                 nomeDoTitular = "Rafael Ponte",
                 cpfDoTitular = "12345678900",
                 agencia = "1218",
-                numeroDaConta = "123456",
-                ispb = "112233"
+                numeroDaConta = "123456"
             )
         )
     }
