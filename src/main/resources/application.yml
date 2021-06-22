@@ -10,6 +10,7 @@ grpc:
 
 datasources:
   default:
+    #?useTimezone=true&serverTimezone=America/Sao_Paulo
     url: ${DB_URL:`jdbc:mysql://localhost:3306/keymanager_grpc?createDatabaseIfNotExist=true`}
     driverClassName: com.mysql.cj.jdbc.Driver
     username: ${DB_USER:root}
